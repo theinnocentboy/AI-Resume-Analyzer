@@ -50,6 +50,9 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 db.init_app(app)
 Session(app)
 
+with app.app_context():
+    db.create_all()
+
 # Initialize Groq client
 GROQ_API_KEY = os.environ.get('GROQ_API_KEY')
 groq_client = groq.Groq(api_key=GROQ_API_KEY)

@@ -10,6 +10,9 @@ import re
 from dotenv import load_dotenv
 from models import db, User, Resume, AnalysisReport
 import groq
+import cloudinary
+import cloudinary.uploader
+from cloudinary.utils import cloudinary_url
 
 
 load_dotenv()
@@ -30,6 +33,12 @@ app.config['SESSION_TYPE'] = 'filesystem'
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+# Configure Cloudinary using environment variables
+cloudinary.config( 
+    cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME'), 
+    api_key = os.environ.get('CLOUDINARY_API_KEY'), 
+    api_secret = os.environ.get('CLOUDINARY_API_SECRET') 
+)
 
 # Allowed file extensions
 ALLOWED_EXTENSIONS = {'pdf'}
@@ -361,37 +370,50 @@ def upload_resume():
             flash('Only PDF files are allowed', 'danger')
             return redirect(url_for('upload_resume'))
         
+        
         try:
-            # Save file
+            # 1. Save file locally (temporarily for text extraction)
             filename = secure_filename(f"{datetime.utcnow().timestamp()}_{file.filename}")
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(file_path)
             
-            # Extract text
+            # 2. Extract text using your existing pdfplumber function
             extracted_text = extract_text_from_pdf(file_path)
             
             if not extracted_text.strip():
-                os.remove(file_path)
+                if os.path.exists(file_path):
+                    os.remove(file_path)
                 flash('Could not extract text from PDF', 'danger')
                 return redirect(url_for('upload_resume'))
+
+            # 3. Upload the PDF to Cloudinary (resource_type="raw" preserves the PDF format)
+            upload_result = cloudinary.uploader.upload(file_path, resource_type="raw")
+            secure_cloud_url = upload_result.get("secure_url")
             
-            # Save resume to database
+            # 4. Clean up the local ephemeral disk space immediately
+            if os.path.exists(file_path):
+                os.remove(file_path)
+            
+            # 5. Save record to PostgreSQL using the Cloud URL instead of the local path
             resume = Resume(
                 user_id=session['user_id'],
                 filename=filename,
                 original_filename=file.filename,
-                file_path=file_path,
-                file_size=os.path.getsize(file_path),
+                file_path=secure_cloud_url,  # The permanent cloud link
+                file_size=upload_result.get("bytes", 0),
                 extracted_text=extracted_text
             )
             db.session.add(resume)
             db.session.commit()
             
-            flash('Resume uploaded successfully!', 'success')
+            flash('Resume uploaded securely to the cloud!', 'success')
             return redirect(url_for('analyze_resume', resume_id=resume.id))
             
         except Exception as e:
             db.session.rollback()
+            # Failsafe cleanup to avoid accumulating files if the upload fails mid-way
+            if 'file_path' in locals() and os.path.exists(file_path):
+                os.remove(file_path)
             flash(f'Error uploading resume: {str(e)}', 'danger')
             return redirect(url_for('upload_resume'))
     

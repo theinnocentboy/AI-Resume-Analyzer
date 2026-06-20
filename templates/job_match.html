@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="glass-card p-5">
+            <h2 class="mb-3">Job Description Match</h2>
+            <p class="text-muted mb-4">Paste the full job description below to see how well your resume (<strong>{{ resume.original_filename }}</strong>) aligns with the role's requirements.</p>
+            
+            <form method="POST" action="{{ url_for('job_match', resume_id=resume.id) }}">
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Job Description</label>
+                    <textarea class="form-control" name="job_description" rows="12" placeholder="Paste the job posting here..." required minlength="50"></textarea>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary" onclick="this.innerHTML='Analyzing Match...'; this.classList.add('disabled');">
+                        Analyze Job Match
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

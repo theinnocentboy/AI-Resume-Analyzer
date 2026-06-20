@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2 class="mb-4">Analysis History</h2>
+
+<div class="glass-card p-4">
+    {% if reports.items %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Resume Name</th>
+                        <th>Resume Score</th>
+                        <th>ATS Score</th>
+                        <th>Job Match</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for report in reports.items %}
+                    <tr>
+                        <td>{{ report.created_at.strftime('%Y-%m-%d %H:%M') if report.created_at else 'Unknown' }}</td>
+                        <td>{{ report.resume.original_filename if report.resume else 'Unknown Resume' }}</td>
+                        <td><span class="badge bg-success">{{ report.resume_score|default(0) }}%</span></td>
+                        <td><span class="badge bg-info">{{ report.ats_score|default(0) }}%</span></td>
+                        <td>
+                            {% if report.match_score and report.match_score > 0 %}
+                                <span class="badge bg-primary">{{ report.match_score }}%</span>
+                            {% else %}
+                                <span class="text-muted small">Not checked</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="{{ url_for('view_analysis', report_id=report.id) }}" class="btn btn-sm btn-outline-primary">View Results</a>
+                                {% if report.match_score and report.match_score > 0 %}
+                                    <a href="{{ url_for('view_job_match', report_id=report.id) }}" class="btn btn-sm btn-outline-info">View Job Match</a>
+                                {% endif %}
+                                <form action="{{ url_for('delete_report', report_id=report.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this report?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        {% if reports.pages > 1 %}
+        <nav aria-label="History page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                <li class="page-item {% if not reports.has_prev %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('history', page=reports.prev_num) }}">Previous</a>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link">Page {{ reports.page }} of {{ reports.pages }}</span>
+                </li>
+                <li class="page-item {% if not reports.has_next %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('history', page=reports.next_num) }}">Next</a>
+                </li>
+            </ul>
+        </nav>
+        {% endif %}
+        
+    {% else %}
+        <p class="text-muted text-center py-4">No reports found. Upload a resume to get started!</p>
+    {% endif %}
+</div>
+{% endblock %}

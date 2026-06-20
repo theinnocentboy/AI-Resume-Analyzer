@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row align-items-center min-vh-75 mt-5">
+    <div class="col-lg-6">
+        <h1 class="display-4 fw-bold mb-4">Optimize Your Resume with AI</h1>
+        <p class="lead mb-4">Get instant, actionable feedback on your resume using advanced AI. Check ATS compatibility, identify missing skills, and match your profile to job descriptions.</p>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+            <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg px-4 me-md-2">Get Started for Free</a>
+            <a href="{{ url_for('login') }}" class="btn btn-outline-secondary btn-lg px-4">Login</a>
+        </div>
+    </div>
+    <div class="col-lg-6 mt-5 mt-lg-0">
+        <div class="glass-card p-5 text-center">
+            <h3 class="mb-4">Features</h3>
+            <ul class="list-unstyled text-start">
+                <li class="mb-3">✓ <strong>ATS Scoring:</strong> See how robots read your resume.</li>
+                <li class="mb-3">✓ <strong>Skill Gap Analysis:</strong> Find out what you're missing.</li>
+                <li class="mb-3">✓ <strong>Job Matching:</strong> Compare your CV to job posts.</li>
+                <li class="mb-3">✓ <strong>Actionable Insights:</strong> Get specific improvement tips.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

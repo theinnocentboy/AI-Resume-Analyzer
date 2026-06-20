@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+        <h2>Analysis Results: {{ report.resume.original_filename }}</h2>
+        <div>
+            <a href="{{ url_for('job_match', resume_id=report.resume_id) }}" class="btn btn-primary">Compare with Job Description</a>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">Back to Dashboard</a>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6 mb-3">
+        <div class="glass-card p-4 text-center h-100">
+            <h4 class="mb-3">Resume Quality Score</h4>
+            <div class="display-3 mb-3 fw-bold text-success">{{ report.resume_score }}<span class="fs-4 text-muted">/100</span></div>
+            <div class="progress" style="height: 15px;">
+                <div class="progress-bar bg-success" style="width: {{ report.resume_score }}%"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="glass-card p-4 text-center h-100">
+            <h4 class="mb-3">ATS Compatibility</h4>
+            <div class="display-3 mb-3 fw-bold text-info">{{ report.ats_score }}<span class="fs-4 text-muted">/100</span></div>
+            <div class="progress" style="height: 15px;">
+                <div class="progress-bar bg-info" style="width: {{ report.ats_score }}%"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="glass-card p-4 mb-4">
+    <h4 class="mb-3 text-primary">Professional Summary Review</h4>
+    <p class="lead">{{ report.summary_review }}</p>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="glass-card p-4 h-100">
+            <h5 class="text-success border-bottom pb-2">Skills Identified</h5>
+            <div class="d-flex flex-wrap gap-2 mt-3">
+                {% for skill in skills %}
+                    <span class="badge bg-success text-white px-3 py-2 fs-6">{{ skill }}</span>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="glass-card p-4 h-100">
+            <h5 class="text-danger border-bottom pb-2">Missing / In-Demand Skills</h5>
+            <div class="d-flex flex-wrap gap-2 mt-3">
+                {% for skill in missing_skills %}
+                    <span class="badge bg-danger text-white px-3 py-2 fs-6">{{ skill }}</span>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="glass-card p-4 h-100">
+            <h5 class="text-primary border-bottom pb-2">Key Strengths</h5>
+            <ul class="list-group list-group-flush mt-3">
+                {% for strength in strengths %}
+                    <li class="list-group-item bg-transparent">{{ strength }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="glass-card p-4 h-100">
+            <h5 class="text-warning border-bottom pb-2">Areas for Improvement</h5>
+            <ul class="list-group list-group-flush mt-3">
+                {% for weakness in weaknesses %}
+                    <li class="list-group-item bg-transparent">{{ weakness }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="glass-card p-4 mb-5 border-start border-4 border-primary">
+    <h4 class="mb-3">Actionable Next Steps</h4>
+    <ul class="list-group list-group-flush text-start">
+        {% for improvement in improvements %}
+            <li class="list-group-item bg-transparent">
+                <strong>Step {{ loop.index }}:</strong> {{ improvement }}
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

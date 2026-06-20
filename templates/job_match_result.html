@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+        <h2>Job Match Results</h2>
+        <a href="{{ url_for('view_analysis', report_id=report.id) }}" class="btn btn-outline-secondary">Back to Resume Analysis</a>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="glass-card p-4 text-center h-100 d-flex flex-column justify-content-center">
+            <h4 class="mb-3">Match Score</h4>
+            <div class="display-1 fw-bold {% if report.match_score >= 75 %}text-success{% elif report.match_score >= 50 %}text-warning{% else %}text-danger{% endif %}">
+                {{ report.match_score }}%
+            </div>
+            <p class="text-muted mt-2">Overall alignment with job requirements</p>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="glass-card p-4 h-100">
+            <h4 class="mb-3">Analysis</h4>
+            <p style="white-space: pre-wrap;">{{ analysis }}</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="glass-card p-4 h-100 border-start border-4 border-danger">
+            <h5 class="mb-3">Missing Keywords (Action Required)</h5>
+            <p class="text-muted small">These keywords appear in the job description but were not found in your resume.</p>
+            <div class="d-flex flex-wrap gap-2">
+                {% for keyword in missing_keywords %}
+                    <span class="badge bg-danger bg-opacity-75 fs-6">{{ keyword }}</span>
+                {% else %}
+                    <span class="text-success">Great job! No major missing keywords identified.</span>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="glass-card p-4 h-100 border-start border-4 border-primary">
+            <h5 class="mb-3">Specific Improvement Suggestions</h5>
+            <ul class="list-group list-group-flush">
+                {% for suggestion in suggestions %}
+                    <li class="list-group-item bg-transparent py-2">✓ {{ suggestion }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

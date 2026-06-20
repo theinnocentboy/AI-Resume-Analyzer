@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="glass-card p-5 text-center">
+            <h2 class="mb-4">Upload Your Resume</h2>
+            <p class="text-muted mb-4">Please upload your resume in PDF format (Max 16MB). Our AI will analyze your structure, content, and ATS compatibility.</p>
+            
+            <form method="POST" action="{{ url_for('upload_resume') }}" enctype="multipart/form-data">
+                <div class="mb-4">
+                    <input class="form-control form-control-lg" type="file" name="resume_file" accept=".pdf" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-lg w-100" onclick="this.innerHTML='Uploading and Analyzing... Please wait'; this.classList.add('disabled');">
+                    Upload & Analyze Resume
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
